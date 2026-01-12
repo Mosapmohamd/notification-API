@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = FastAPI(title="Save Car API")
 
-N8N_WEBHOOK_URL = "https://zeyadashraf.app.n8n.cloud/webhook-test/8d217ead-10dd-464f-8f01-03a01d071079"
+N8N_WEBHOOK_URL = "https://zeyadashraf.app.n8n.cloud/webhook-test/4a7b074f-237a-4444-bfad-ac6f4fc78211"
 
 DB_CONFIG = {
     "host": "aws-1-ca-central-1.pooler.supabase.com",
@@ -114,3 +114,4 @@ def save_car(req: SaveCarRequest):
         "success": True,
         "data": payload
     }
+
