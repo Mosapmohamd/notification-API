@@ -34,7 +34,7 @@ def get_car_by_ad_link(ad_link: str):
             price,
             ad_link,
             status,
-            estValue,
+            est_value,
             description,
             location,
             odometer,
