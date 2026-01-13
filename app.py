@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = FastAPI(title="Save Car API")
 
-N8N_WEBHOOK_URL = "https://zeyadashraf.app.n8n.cloud/webhook-test/4a7b074f-237a-4444-bfad-ac6f4fc78211"
+N8N_WEBHOOK_URL = "https://zeyadashraf.app.n8n.cloud/webhook/4a7b074f-237a-4444-bfad-ac6f4fc78211"
 
 DB_CONFIG = {
     "host": "aws-1-ca-central-1.pooler.supabase.com",
@@ -119,4 +119,5 @@ def save_car(req: SaveCarRequest):
     except Exception as e:
         print("ERROR:", e)
         raise HTTPException(status_code=500, detail=str(e))
+
 
