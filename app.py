@@ -39,12 +39,12 @@ def get_car_by_ad_link(ad_link: str):
             location,
             odometer,
             source
-        FROM all
-        WHERE ad_link = %s
+        FROM "all"
+        WHERE TRIM(ad_link) ILIKE TRIM(%s)
         LIMIT 1
     """
 
-    cur.execute(query, (ad_link,))
+    cur.execute(query, (f"%{ad_link}%",))
     row = cur.fetchone()
 
     cur.close()
@@ -79,39 +79,43 @@ def get_car_by_ad_link(ad_link: str):
 
 @app.post("/save-car")
 def save_car(req: SaveCarRequest):
-    car = get_car_by_ad_link(req.ad_link)
-
-    if not car:
-        raise HTTPException(status_code=404, detail="Car not found")
-
-    payload = {
-        "date": datetime.utcnow().strftime("%Y-%m-%d"),
-        "sent_by": "Website",
-        "status": car["status"],
-        "vehicle_model": car["vehicle_model"],
-        "listing_link": car["listing_link"],
-        "seller_phone": "",
-        "sells_for": car["sells_for"],
-        "listed_price": car["listed_price"],
-        "target_buy_price": "",
-        "seller_lowest_price": "",
-        "comments": car["comments"],
-    }
-
     try:
+        car = get_car_by_ad_link(req.ad_link)
+
+        if not car:
+            raise HTTPException(status_code=404, detail="Car not found")
+
+        payload = {
+            "date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "sent_by": "Website",
+            "status": car["status"],
+            "vehicle_model": car["vehicle_model"],
+            "listing_link": car["listing_link"],
+            "seller_phone": "",
+            "sells_for": car["sells_for"],
+            "listed_price": car["listed_price"],
+            "target_buy_price": "",
+            "seller_lowest_price": "",
+            "comments": car["comments"],
+        }
+
         response = requests.post(
             N8N_WEBHOOK_URL,
             json=payload,
             timeout=10
         )
-    except requests.RequestException:
-        raise HTTPException(status_code=500, detail="n8n request failed")
 
-    if response.status_code != 200:
-        raise HTTPException(status_code=500, detail="n8n webhook error")
+        if response.status_code != 200:
+            raise Exception(response.text)
 
-    return {
-        "success": True,
-        "data": payload
-    }
+        return {
+            "success": True,
+            "data": payload
+        }
 
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        print("ERROR:", e)
+        raise HTTPException(status_code=500, detail=str(e))
